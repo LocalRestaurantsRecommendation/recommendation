@@ -253,17 +253,21 @@ Mean Average Precision @ 10 Over Samples:
 
 * if I can do this project again I will improve this project in aspect of latency, since currently my recommend function is ad-hoc function, which cannot handle large amount of requests.
 
+```
 Number of solutions I considered are 
 1. doing daily recommendation on active users and save the recommendation for next day on local
 
 2. distribute users query to different machines
 
 3. maybe, but i think it would be hard, to figure out a way to update model incrementally
+```
 
 * One thing I noticed from my result table is that it's not guaranteed that time biased hybrid model is always better than baseline model. 
 
+```
 After I examine my log files to look deeply into those rounds, some users get good prediction on baseline but very bad prediction on hybrid. The reason could be the trade-off of choosing ```7 days``` as hyperparameter of my hybrid.
 
 Unfortunately, I cannot generate user distribution graph on my local machine, because the process can simply run out of memory due to the large amount of users.
 
 If I have another chance, I can figure out a way to run this process on cloud.
+```
