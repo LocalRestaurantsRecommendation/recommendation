@@ -55,7 +55,7 @@ The dataset includes users' rating behavior on local business, which includes re
 ### Data Understanding
 Other interesting facts I learned from the data.
 
-* there are 683 cities in total
+* there are ```683``` cities in total
 
 ### Data Preprocess
 One question for recommending restaurants is that we can have restaurants open and close often. It's not reasonable to recommend a closed restaurant, and my recommendation function should be aware of new restaurants as soon as possible.
