@@ -88,11 +88,11 @@ So far I mapped between restaurants and feature vectors, here is some interestin
 Since multiple restaurants can have same feature vector, it's possible for a user to have conflict rating on save feature vector.
 
 From my dataset,
-* Max rating difference between single user-feature vector pair is ```4```
+* Max rating difference between single user-feature vector pair is ```4.0```
 * In total, ```99``` user-feature vector pairs' rating difference ```> 2```
-* The disagreement happens in ```57``` feature vectors
+* The disagreement happens in ```50``` feature vectors
 
-Consider in total of ```36341``` feature vectors, ```57``` is fairly small number I can tolerant. So here I didn't step back to re-design the feature vectors. Instead, I resolve the disagreement in a simple way:
+Consider in total of ```36341``` feature vectors, ```50``` is fairly small number I can tolerant. So here I didn't step back to re-design the feature vectors. Instead, I resolve the disagreement in a simple way:
 
 For all conflict pairs, the rating behaviors are replaced by following new rating:
 
