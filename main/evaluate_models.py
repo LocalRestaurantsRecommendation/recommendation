@@ -13,6 +13,7 @@ def one_for_all_load():
 	load reviews, user_city, rest_city
 	"""
 	reviews = load_reviews(DATA_DIR + "dedup_filtered_reviews.data")
+	
 	user_city = load_mapping(
 		input_file=DATA_DIR + "int_user_id_to_cities.data", 
 		value_is_set=True,
@@ -23,7 +24,13 @@ def one_for_all_load():
 		value_is_set=False,
 		eval_set={0}
 		)
-	return reviews, user_city, rest_city
+
+	rest_id_to_int = load_mapping(
+		input_file=DATA_DIR + "restaurants_id_to_int.data", 
+		value_is_set=False,
+		eval_set={1}
+		)
+	return reviews, user_city, rest_city, rest_id_to_int
 
 def evaluate_models_for_rounds(
 	rounds=10,
@@ -212,7 +219,7 @@ def evaluate_models_on_yelp_open_dataset(
 	output file:
 		report.data
 	"""
-	reviews, user_city, rest_city = one_for_all_load()
+	reviews, user_city, rest_city, rest_id_to_int = one_for_all_load()
 	user_ratings = map_user_to_ratings(reviews)
 
 	user_list_all = list()
@@ -263,6 +270,7 @@ def evaluate_models_on_yelp_open_dataset(
 			reviews=reviews,
 			user_city=user_city,
 			rest_city=rest_city,
+			rest_id_to_int=rest_id_to_int,
 			model=model, 
 			k=k, 
 			removeSeen=removeSeen,

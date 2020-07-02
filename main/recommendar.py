@@ -11,6 +11,9 @@ from main.model.als_model import Model as AlsModel
 from main.model.naive_hybrid_baseline_als_model import Model as NHBAModel
 from main.model.time_biased_hybrid_model import Model as TBHModel
 
+#-------------------------------
+# Constants
+#-------------------------------
 MAPPING_MODEL = {
 	"baseline" : BaselineModel,
 	"als" : AlsModel,
@@ -18,10 +21,55 @@ MAPPING_MODEL = {
 	"tbh" : TBHModel
 }
 
+#-------------------------------
+# Helper Functions
+#-------------------------------
+def map_user_to_ratings(reviews):
+	"""
+	helper function
+	return mapping from user_id to num of ratings in reviews
+	"""
+	user_ratings = dict()
+	for review in reviews:
+		user = review[0]
+		if user not in user_ratings:
+			user_ratings[user] = 0
+		else:
+			user_ratings[user] = user_ratings[user] + 1
+
+	return user_ratings
+
+def map_feature_ids_to_restaurants(feature_list, rest_id_to_int):
+	"""
+	helper function
+	return list of restaurants mapped from feature in feature_list
+	in same order as feature_list
+	"""
+
+	invert_mapping = dict()
+	for (rest_id, feature) in rest_id_to_int.items():
+		if feature not in feature_list:
+			continue
+
+		if feature not in invert_mapping:
+			invert_mapping[feature] = list()
+
+		invert_mapping[feature].append(rest_id)
+
+	rest_list = list()
+	for feature in feature_list:
+		rest_list += invert_mapping[feature]
+
+	return rest_list
+
+#-------------------------------
+# APIs
+#-------------------------------
 def get_recommendar(
 	reviews,
 	user_city,
 	rest_city,
+	rest_id_to_int,
 	model="baseline",
 	k=TOP_K,
 	removeSeen=True,
@@ -42,6 +90,10 @@ def get_recommendar(
 		rest_city:
 			mapping from feature_id to city
 			filename to load rest_city data
+
+		rest_id_to_int:
+			mapping from restaurants id to feature id
+			filename to load restaurants id to feature id
 
 		model:
 			model for train
@@ -65,6 +117,7 @@ def get_recommendar(
 		reviews=reviews,
 		user_city=user_city,
 		rest_city=rest_city,
+		rest_id_to_int=rest_id_to_int,
 		model=model,
 		k=k,
 		removeSeen=removeSeen,
@@ -72,27 +125,13 @@ def get_recommendar(
 		latest_rating_limiter=latest_rating_limiter
 		)
 
-def map_user_to_ratings(reviews):
-	"""
-	helper function
-	return mapping from user_id to num of ratings in reviews
-	"""
-	user_ratings = dict()
-	for review in reviews:
-		user = review[0]
-		if user not in user_ratings:
-			user_ratings[user] = 0
-		else:
-			user_ratings[user] = user_ratings[user] + 1
-
-	return user_ratings
-
 class LocalRecommendar:
 	"""
 	state:
 		self.reviews : list of reviews from review_file
 		self.user_city : int_user_id maps to cities
 		self.rest_city : feature_id maps to cities
+		self.rest_id_to_int : restaurant_id maps to feature_id
 		self.model : model to do recommendation
 		self.k : top k restaurants' feature id to recommend
 		self.removeSeen : whether or not recommend seen feature_id
@@ -106,6 +145,7 @@ class LocalRecommendar:
 		reviews,
 		user_city,
 		rest_city,
+		rest_id_to_int,
 		model="baseline",
 		k=TOP_K,
 		removeSeen=True,
@@ -127,6 +167,10 @@ class LocalRecommendar:
 				mapping from feature_id to city
 				filename to load rest_city data
 
+			rest_id_to_int:
+				mapping from restaurants id to feature id
+				filename to load restaurants id to feature id
+
 			model: 
 				string name for model
 
@@ -144,6 +188,7 @@ class LocalRecommendar:
 				number of latest rating to consider for each user
 		"""
 		
+		# load reviews
 		if isinstance(reviews, list):
 			self.reviews = reviews
 		elif isinstance(reviews, str):
@@ -151,28 +196,43 @@ class LocalRecommendar:
 		else:
 			raise ValueError(f"reviews = {reviews} has invalid type: not list nor str")
 
+		# load user_city
 		if isinstance(user_city, dict):
 			self.user_city = user_city
 		elif isinstance(user_city, str):
 			self.user_city = load_mapping(
-								input_file=user_city, 
-								value_is_set=True,
-								eval_set={0}
-								)
+				input_file=user_city, 
+				value_is_set=True,
+				eval_set={0}
+				)
 		else:
 			raise ValueError(f"user_city = {user_city} has invalid type: not dict nor str")
 
+		# load rest_city
 		if isinstance(rest_city, dict):
 			self.rest_city = rest_city
 		elif isinstance(rest_city, str):
 			self.rest_city = load_mapping(
-								input_file=rest_city, 
-								value_is_set=False,
-								eval_set={0}
-								)
+				input_file=rest_city, 
+				value_is_set=False,
+				eval_set={0}
+				)
 		else:
 			raise ValueError(f"rest_city = {rest_city} has invalid type: not dict nor str")
 
+		# load rest_id_to_int
+		if isinstance(rest_id_to_int, dict):
+			self.rest_id_to_int = rest_id_to_int
+		elif isinstance(rest_id_to_int, str):
+			self.rest_id_to_int = load_mapping(
+				input_file=rest_id_to_int, 
+				value_is_set=False,
+				eval_set={1}
+				)
+		else:
+			raise ValueError(f"rest_id_to_int = {rest_id_to_int} has invalid type: not dict nor str")
+
+		# load model
 		if model not in MAPPING_MODEL:
 			raise ValueError(f"model {model} doesn't exist")
 
@@ -414,7 +474,10 @@ class LocalRecommendar:
 
 		model.close()
 
-		return res_dataframe[COL_ITEM].tolist()
+		return map_feature_ids_to_restaurants(
+			feature_list=res_dataframe[COL_ITEM].tolist(),
+			rest_id_to_int=self.rest_id_to_int
+			)
 
 	def _get_model(self, user_id, model_name, data_reviews):
 		"""

@@ -389,6 +389,7 @@ def get_recommendar(
 	reviews,
 	user_city,
 	rest_city,
+	rest_id_to_int,
 	model="baseline",
 	k=TOP_K,
 	removeSeen=True,
@@ -409,6 +410,10 @@ def get_recommendar(
 		rest_city:
 			mapping from feature_id to city
 			filename to load rest_city data
+
+		rest_id_to_int:
+			mapping from restaurants id to feature id
+			filename to load restaurants id to feature id
 
 		model:
 			model for train
@@ -435,6 +440,7 @@ class LocalRecommendar:
 		self.reviews : list of reviews from review_file
 		self.user_city : int_user_id maps to cities
 		self.rest_city : feature_id maps to cities
+		self.rest_id_to_int : restaurant_id maps to feature_id
 		self.model : model to do recommendation
 		self.k : top k restaurants' feature id to recommend
 		self.removeSeen : whether or not recommend seen feature_id
@@ -448,6 +454,7 @@ class LocalRecommendar:
 		reviews,
 		user_city,
 		rest_city,
+		rest_id_to_int,
 		model="baseline",
 		k=TOP_K,
 		removeSeen=True,
@@ -468,6 +475,10 @@ class LocalRecommendar:
 			rest_city:
 				mapping from feature_id to city
 				filename to load rest_city data
+
+			rest_id_to_int:
+				mapping from restaurants id to feature id
+				filename to load restaurants id to feature id
 
 			model: 
 				string name for model
