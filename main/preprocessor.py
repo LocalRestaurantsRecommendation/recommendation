@@ -332,7 +332,7 @@ def map_restaurant_to_feature_dict(
 	return frozenset(feature_dict.items())
 
 #-------------------------------
-# Main Functions
+# APIs
 #-------------------------------
 def load_restaurants_and_features(
 	business_file,
@@ -911,12 +911,15 @@ def preprocess_yelp_open_dataset(
 	e.g.
 	4	St. Léonard
 	"""
-	# load from original dataset
+	# make directory if not exist
 	os.makedirs(os.path.dirname(output_dir), exist_ok=True)
 	eval_feature_dir = output_dir + "eval_feature_ids/"
 	os.makedirs(os.path.dirname(eval_feature_dir), exist_ok=True)
 
-	restaurants, tffeature, valfeature, existfeature = load_restaurants_and_features(BUSINESS)
+	# load from original dataset
+	restaurants, tffeature, valfeature, existfeature = load_restaurants_and_features(
+		business_file=business_file
+		)
 
 	feature_vector_to_int, restaurants_id_to_int = develop_feature_ids(
 		restaurants=restaurants, 
@@ -926,7 +929,7 @@ def preprocess_yelp_open_dataset(
 		)
 
 	user_id_to_int, filtered_reviews, original_reviews = load_reviews_and_users(
-		review_file=REVIEW, 
+		review_file=review_file, 
 		restaurants_id_to_int=restaurants_id_to_int
 		)
 
@@ -955,6 +958,7 @@ def preprocess_yelp_open_dataset(
 		feature_id_to_cities=feature_id_to_cities
 		)
 
+	# save data
 	save_filtered_open_restaurants(
 		restaurants=restaurants,
 		output_dir=output_dir,
