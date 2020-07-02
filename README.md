@@ -56,6 +56,7 @@ The dataset includes users' rating behavior on local business, which includes re
 Other interesting facts I learned from the data.
 
 * there are ```683``` cities in total
+* there are ```25``` states in total
 
 ### Data Preprocess
 One question for recommending restaurants is that we can have restaurants open and close often. It's not reasonable to recommend a closed restaurant, and my recommendation function should be aware of new restaurants as soon as possible.
@@ -73,14 +74,14 @@ The feature vectors I choosed was developed from set of features a restaurant ca
 | Feature Name     | Feature Num |
 |:----------------:|:-----------:|
 | T/F feature      | 50          |
-| Val feature      | 46          |
+| Val feature      | 47          |
 | Exist feature    | 750         |
 
 ### More On Preprocess
 So far I mapped between restaurants and feature vectors, here is some interesting fact I learned from this mapping:
 
-* there are ```36341``` feature vectors used in original dataset
-* there are ```353``` feature vectors used for multiple restaurants
+* there are ```36342``` feature vectors used in original dataset
+* there are ```352``` feature vectors used for multiple restaurants
 * At most ```18``` restaurants have exactly same feature vector
 
 ### Resolve Disagreement for User and Feature Pair
@@ -92,7 +93,7 @@ From my dataset,
 * In total, ```99``` user-feature vector pairs' rating difference ```> 2```
 * The disagreement happens in ```50``` feature vectors
 
-Consider in total of ```36341``` feature vectors, ```50``` is fairly small number I can tolerant. So here I didn't step back to re-design the feature vectors. Instead, I resolve the disagreement in a simple way:
+Consider in total of ```36342``` feature vectors, ```50``` is fairly small number I can tolerant. So here I didn't step back to re-design the feature vectors. Instead, I resolve the disagreement in a simple way:
 
 For all conflict pairs, the rating behaviors are replaced by following new rating:
 
