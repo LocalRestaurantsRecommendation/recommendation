@@ -11,16 +11,16 @@
 				|
 				|
 				|
-				Back End
-	|				|							|
-	|				|							|
-	|				|							|
-	MySQL:database	Python: Recommendation	Java: Servlets
-							<------------------------->
-								preprocess(files)
-								train(files)
-								predict(user)
-	<------------------------------------------------->
+	-------------------------Back End--------------------------------
+	|				|				|
+	|				|				|
+	|				|				|
+	MySQL:database		Python: Recommendation		Java: Servlets
+						<------------------------->
+							preprocess(files)
+							train(files)
+							predict(user)
+	       <------------------------------------------------->
 		R/W into database
 		Execute to local files
 ```
