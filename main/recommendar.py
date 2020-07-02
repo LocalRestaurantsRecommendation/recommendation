@@ -285,7 +285,7 @@ class LocalRecommendar:
 			int_user_id, total_ratings, best_train_number, average precision @ k, precision @ k, recall @ k
 			1	300	10	0.9	0.5	0.5
 
-		return average precision @ k for all users
+		return mean average precision @ k over user_list
 		"""
 		print("Woking on {} users...".format(len(user_list)))
 
@@ -407,7 +407,7 @@ class LocalRecommendar:
 			model.close()
 
 			print("\tres_dataframe: {}".format(res_dataframe.shape))
-			print("\tCalculate APK & ARK ...")
+			print("\tCalculate APK & PK & RK ...")
 			pk, rk, apk = evaluate_top_k_for_user(
 				self.reviews_dataframe[
 					(self.reviews_dataframe[COL_USER] == user_id) 
