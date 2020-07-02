@@ -73,7 +73,7 @@ def get_recommendar(
 	model="baseline",
 	k=TOP_K,
 	removeSeen=True,
-	consider_latest_rating_only=True,
+	infer_loc_by_latest_rating_only=True,
 	latest_rating_limiter=3
 	):
 	"""
@@ -106,8 +106,8 @@ def get_recommendar(
 			true, we don't recommend items users rated
 			false, otherwise
 
-		consider_latest_rating_only:
-			whether or not consider only latest rating we know
+		infer_loc_by_latest_rating_only:
+			infer user's location by latest rating or all ratings
 
 		latest_rating_limiter:
 			hyperparameters for whole recommendar
@@ -121,7 +121,7 @@ def get_recommendar(
 		model=model,
 		k=k,
 		removeSeen=removeSeen,
-		consider_latest_rating_only=consider_latest_rating_only,
+		infer_loc_by_latest_rating_only=infer_loc_by_latest_rating_only,
 		latest_rating_limiter=latest_rating_limiter
 		)
 
@@ -137,7 +137,7 @@ class LocalRecommendar:
 		self.removeSeen : whether or not recommend seen feature_id
 		self.reviews_dataframe : pandas dataframe of reviews
 		self.user_ratings : mapping from user id to num of ratings
-		self.consider_latest_rating_only : whether or not consider latest rating
+		self.infer_loc_by_latest_rating_only : whether or not consider latest rating
 		self.latest_rating_limiter : num of latest rating to consider
 	"""
 	def __init__(
@@ -149,7 +149,7 @@ class LocalRecommendar:
 		model="baseline",
 		k=TOP_K,
 		removeSeen=True,
-		consider_latest_rating_only=True,
+		infer_loc_by_latest_rating_only=True,
 		latest_rating_limiter=3
 		):
 		"""
@@ -180,8 +180,8 @@ class LocalRecommendar:
 			removeSeen: 
 				whether or not recommend seen feature_id
 
-			consider_latest_rating_only:
-				whether or not consider only latest rating we know
+			infer_loc_by_latest_rating_only:
+				infer user's location by latest rating or all ratings
 
 			latest_rating_limiter:
 				hyperparameters for whole recommendar
@@ -239,7 +239,7 @@ class LocalRecommendar:
 		self.model = model
 		self.k = k
 		self.removeSeen = removeSeen
-		self.consider_latest_rating_only = consider_latest_rating_only
+		self.infer_loc_by_latest_rating_only = infer_loc_by_latest_rating_only
 		self.latest_rating_limiter = latest_rating_limiter
 
 
@@ -366,7 +366,7 @@ class LocalRecommendar:
 				city_list_all.append(self.rest_city[row[COL_ITEM]])
 
 			# only consider cities for limited number of latest rating
-			if self.consider_latest_rating_only:
+			if self.infer_loc_by_latest_rating_only:
 				city_list = set()
 				index = len(city_list_all) - 1
 				while index >= 0 and index + self.latest_rating_limiter >= len(city_list_all):
@@ -437,7 +437,7 @@ class LocalRecommendar:
 		"""
 
 		# only consider cities for limited number of latest rating
-		if self.consider_latest_rating_only:
+		if self.infer_loc_by_latest_rating_only:
 			first_number_rating = self.reviews_dataframe[self.reviews_dataframe[COL_USER] == user_id] \
 									.sort_values(COL_TIMESTAMP, ascending=False)
 

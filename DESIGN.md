@@ -393,7 +393,7 @@ def get_recommendar(
 	model="baseline",
 	k=TOP_K,
 	removeSeen=True,
-	consider_latest_rating_only=True,
+	infer_loc_by_latest_rating_only=True,
 	latest_rating_limiter=3
 	):
 	"""
@@ -426,8 +426,8 @@ def get_recommendar(
 			true, we don't recommend items users rated
 			false, otherwise
 
-		consider_latest_rating_only:
-			whether or not consider only latest rating we know
+		infer_loc_by_latest_rating_only:
+			infer user's location by latest rating or all ratings
 
 		latest_rating_limiter:
 			hyperparameters for whole recommendar
@@ -446,7 +446,7 @@ class LocalRecommendar:
 		self.removeSeen : whether or not recommend seen feature_id
 		self.reviews_dataframe : pandas dataframe of reviews
 		self.user_ratings : mapping from user id to num of ratings
-		self.consider_latest_rating_only : whether or not consider latest rating
+		self.infer_loc_by_latest_rating_only : whether or not consider latest rating
 		self.latest_rating_limiter : num of latest rating to consider
 	"""
 	def __init__(
@@ -458,7 +458,7 @@ class LocalRecommendar:
 		model="baseline",
 		k=TOP_K,
 		removeSeen=True,
-		consider_latest_rating_only=True,
+		infer_loc_by_latest_rating_only=True,
 		latest_rating_limiter=3
 		):
 		"""
@@ -489,8 +489,8 @@ class LocalRecommendar:
 			removeSeen: 
 				whether or not recommend seen feature_id
 
-			consider_latest_rating_only:
-				whether or not consider only latest rating we know
+			infer_loc_by_latest_rating_only:
+				infer user's location by latest rating or all ratings
 
 			latest_rating_limiter:
 				hyperparameters for whole recommendar
@@ -605,13 +605,13 @@ def evaluate_models_for_rounds(
 	sample_list=None,
 	sample_limit=70,
 	seed=None,
-	min_rating=100,
+	min_rating=50,
 	k=TOP_K,
 	removeSeen=True,
-	consider_latest_rating_only=True,
+	infer_loc_by_latest_rating_only=True,
 	latest_rating_limiter=3,
-	training_number_params=[1,3,5,7,10],
-	is_params_ratio=False,
+	training_number_params=[0.3, 0.5, 0.7],
+	is_params_ratio=True,
 	col_separator=COL_SEPARATOR
 	):
 	"""
@@ -654,8 +654,8 @@ def evaluate_models_for_rounds(
 			true, we don't recommend items users rated
 			false, otherwise
 
-		consider_latest_rating_only:
-			whether or not consider only latest rating we know
+		infer_loc_by_latest_rating_only:
+			infer user's location by latest rating or all ratings
 
 		latest_rating_limiter:
 			hyperparameters for whole recommendar
@@ -687,7 +687,7 @@ def evaluate_models_on_yelp_open_dataset(
 	min_rating=100,
 	k=TOP_K,
 	removeSeen=True,
-	consider_latest_rating_only=True,
+	infer_loc_by_latest_rating_only=True,
 	latest_rating_limiter=3,
 	training_number_params=[1,3,5,7,10],
 	is_params_ratio=False,
@@ -730,8 +730,8 @@ def evaluate_models_on_yelp_open_dataset(
 			true, we don't recommend items users rated
 			false, otherwise
 
-		consider_latest_rating_only:
-			whether or not consider only latest rating we know
+		infer_loc_by_latest_rating_only:
+			infer user's location by latest rating or all ratings
 
 		latest_rating_limiter:
 			hyperparameters for whole recommendar

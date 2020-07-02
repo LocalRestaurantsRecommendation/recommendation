@@ -40,13 +40,13 @@ def evaluate_models_for_rounds(
 	sample_list=None,
 	sample_limit=70,
 	seed=None,
-	min_rating=100,
+	min_rating=50,
 	k=TOP_K,
 	removeSeen=True,
-	consider_latest_rating_only=True,
+	infer_loc_by_latest_rating_only=True,
 	latest_rating_limiter=3,
-	training_number_params=[1,3,5,7,10],
-	is_params_ratio=False,
+	training_number_params=[0.3, 0.5, 0.7],
+	is_params_ratio=True,
 	col_separator=COL_SEPARATOR
 	):
 	"""
@@ -89,8 +89,8 @@ def evaluate_models_for_rounds(
 			true, we don't recommend items users rated
 			false, otherwise
 
-		consider_latest_rating_only:
-			whether or not consider only latest rating we know
+		infer_loc_by_latest_rating_only:
+			infer user's location by latest rating or all ratings
 
 		latest_rating_limiter:
 			hyperparameters for whole recommendar
@@ -134,7 +134,7 @@ def evaluate_models_for_rounds(
 			min_rating=min_rating,
 			k=k,
 			removeSeen=removeSeen,
-			consider_latest_rating_only=consider_latest_rating_only,
+			infer_loc_by_latest_rating_only=infer_loc_by_latest_rating_only,
 			latest_rating_limiter=latest_rating_limiter,
 			training_number_params=training_number_params,
 			is_params_ratio=is_params_ratio,
@@ -151,7 +151,7 @@ def evaluate_models_on_yelp_open_dataset(
 	min_rating=100,
 	k=TOP_K,
 	removeSeen=True,
-	consider_latest_rating_only=True,
+	infer_loc_by_latest_rating_only=True,
 	latest_rating_limiter=3,
 	training_number_params=[1,3,5,7,10],
 	is_params_ratio=False,
@@ -194,8 +194,8 @@ def evaluate_models_on_yelp_open_dataset(
 			true, we don't recommend items users rated
 			false, otherwise
 
-		consider_latest_rating_only:
-			whether or not consider only latest rating we know
+		infer_loc_by_latest_rating_only:
+			infer user's location by latest rating or all ratings
 
 		latest_rating_limiter:
 			hyperparameters for whole recommendar
@@ -258,7 +258,7 @@ def evaluate_models_on_yelp_open_dataset(
 		file.write(f"min_rating = {min_rating}\n")
 		file.write(f"k = {k}\n")
 		file.write(f"removeSeen = {removeSeen}\n")
-		file.write(f"consider_latest_rating_only = {consider_latest_rating_only}\n")
+		file.write(f"infer_loc_by_latest_rating_only = {infer_loc_by_latest_rating_only}\n")
 		file.write(f"latest_rating_limiter = {latest_rating_limiter}\n")
 		file.write(f"training_number_params = {training_number_params}\n")
 		file.write(f"is_params_ratio = {is_params_ratio}\n")
@@ -274,7 +274,7 @@ def evaluate_models_on_yelp_open_dataset(
 			model=model, 
 			k=k, 
 			removeSeen=removeSeen,
-			consider_latest_rating_only=consider_latest_rating_only,
+			infer_loc_by_latest_rating_only=infer_loc_by_latest_rating_only,
 			latest_rating_limiter=latest_rating_limiter
 			)
 
