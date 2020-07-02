@@ -25,17 +25,24 @@ def get_prediction(item_counts, user_item):
 class Model:
 	"""
 	state:
+		self.user
 		self.name
 		self.data
 		self.<hyperparameter_name> ...
 	"""
 
-	def __init__(self, model_name, data_reviews):
+	def __init__(self, user_id, model_name, data_reviews):
 		"""
-		model_name: give this model a name
+		user_id: 
+			this model is for a specific user
+
+		model_name: 
+			give this model a name
+
 		data_reviews:
 			pandas dataframe where each row is review
 		"""
+		self.user = user_id
 		self.name = model_name
 		self.data = data_reviews
 
@@ -52,18 +59,24 @@ class Model:
 		self.item_counts = rank_restaurants_by_rates(self.data)
 
 
-	def predict(self, user_id, k=10, removeSeen=True):
+	def predict(self, k=10, removeSeen=True):
 		"""
 		predict top 10 restaurants on user
 
 		if k <= 0, return all predictions
 		"""
-		user_item = init_user_item(user_id=user_id, data=self.data, removeSeen=removeSeen)
+		user_item = init_user_item(user_id=self.user, data=self.data, removeSeen=removeSeen)
 		baseline_recommendations = get_prediction(self.item_counts, user_item)
-		res = baseline_recommendations[baseline_recommendations[COL_USER] == user_id] \
-			.sort_values(COL_PREDICTION, ascending=False)
+		res = baseline_recommendations[baseline_recommendations[COL_USER] == self.user] \
+				.sort_values(COL_PREDICTION, ascending=False)
 
 		if k <= 0:
 			return res
 		else:
 			return res.head(k)
+
+	def save_model(self, output_dir):
+		"""
+		save this model under output_dir with self.<model_name>_<current_time>
+		"""
+		pass

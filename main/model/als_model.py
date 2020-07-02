@@ -25,19 +25,27 @@ def start_or_get_spark(app_name="Sample", url="local[*]", memory="10g"):
 class Model:
 	"""
 	state:
+		self.user
 		self.name
 		self.data
 		self.<hyperparameter_name> ...
 	"""
-	def __init__(self, model_name, data_reviews):
+
+	def __init__(self, user_id, model_name, data_reviews):
 		"""
-		model_name: give this model a name
+		user_id: 
+			this model is for a specific user
+
+		model_name: 
+			give this model a name
+
 		data_reviews:
 			pandas dataframe where each row is review
 		"""
+		self.user = user_id
 		self.name = model_name
 		self.data = data_reviews
-
+		
 		envr_check()
 
 		self.spark = None
@@ -58,10 +66,7 @@ class Model:
 			)
 
 		self.maxIter = 10
-
 		self.rank = 10
-		# [10 - 0.2, 13, 15 - 0.5, 17 - too high]
-
 		self.regParam = 0.001
 		self.coldStartStrategy = "drop"
 		self.nonnegative = True
@@ -93,13 +98,13 @@ class Model:
 
 		self.model = self.als.fit(self.data_train)
 
-	def predict(self, user_id, k=10, removeSeen=True):
+	def predict(self, k=10, removeSeen=True):
 		"""
 		predict top 10 restaurants on user
 
 		if k <= 0, return all predictions
 		"""
-		user_item = init_user_item(user_id=user_id, data=self.data, removeSeen=removeSeen)
+		user_item = init_user_item(user_id=self.user, data=self.data, removeSeen=removeSeen)
 
 		schema_user_item = StructType(
 								(
@@ -109,7 +114,7 @@ class Model:
 							)
 		user_item = self.spark.createDataFrame(user_item, schema=schema_user_item)
 		sdf_pred = self.model.transform(user_item)
-		pdf_pred = sdf_pred.where(f"{COL_USER} == {user_id}") \
+		pdf_pred = sdf_pred.where(f"{COL_USER} == {self.user}") \
 					.orderBy(desc(COL_PREDICTION))
 
 		if k <= 0:
@@ -117,3 +122,9 @@ class Model:
 			return pdf_pred.toPandas()
 		else:
 			return pdf_pred.limit(k).toPandas()
+
+	def save_model(self, output_dir):
+		"""
+		save this model under output_dir with self.<model_name>_<current_time>
+		"""
+		pass

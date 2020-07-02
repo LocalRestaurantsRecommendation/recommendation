@@ -27,3 +27,7 @@ Having this heuristic in mind, I come to the time biased hybrid solution.
 Since I will recommend top 10 restaurants for each user, how good my recommendation models are is related to how effecient my recommendation models front load relevant candidates.
 
 Thus, average precision at 10 is more appropriate to evaluate.
+
+# What should I do if I want to remember the user's model?
+
+model instance

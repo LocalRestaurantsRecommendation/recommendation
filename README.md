@@ -20,7 +20,7 @@ Options I considered were:
 * User clicked on some restaurant ```>= 1``` times
 * User saved some restaurants on the favorite list / shared with friends
 
-Due to the limited time, I only used users' rating provided by [Yelp Open Dataset](https://www.yelp.com/dataset).
+Due to the limited time, I only used users' rating in my database and users' rating provided by [Yelp Open Dataset](https://www.yelp.com/dataset).
 
 The goal is to get higher precision and recall on output.
 This is evaluated on data we already know, by user-based average precision @ 10.

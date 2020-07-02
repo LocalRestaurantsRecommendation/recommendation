@@ -586,6 +586,86 @@ def evaluate_top_k_for_user(
 
 ## evaluate_models.py
 ```python
+def evaluate_models_for_rounds(
+	rounds=10,
+	output_dir=OUTPUT_DIR,
+	models=["baseline"],
+	evaluate_on_sample_users=True,
+	sample_list=None,
+	sample_limit=70,
+	seed=None,
+	min_rating=100,
+	k=TOP_K,
+	removeSeen=True,
+	consider_latest_rating_only=True,
+	latest_rating_limiter=3,
+	training_number_params=[1,3,5,7,10],
+	is_params_ratio=False,
+	col_separator=COL_SEPARATOR
+	):
+	"""
+	Do rounds of evaluate_models_on_yelp_open_dataset
+
+		rounds:
+			rounds to do evaluate_models_on_yelp_open_dataset
+
+		output_dir:
+			place to hold output files
+
+		models:
+			list of model to evaluate on
+
+		evaluate_on_sample_users:
+			true, we evaluate on sample users
+				either with sample list or sample limit
+
+			false, evaluate on all users with >= min_rating
+
+		sample_list:
+			list of users to evaluate on
+
+		sample_limit:
+			maximum number of sample users to evaluate on
+
+		seed:
+			list of seeds for deterministic sampling
+			if length is not same as rounds, append with None
+
+		min_rating:
+			filter out pool of users to do sample
+			we only evaluate on sample users with >= min_rating
+
+		k:
+			parameter for Recommendar
+			top k items to recommend
+
+		removeSeen:
+			true, we don't recommend items users rated
+			false, otherwise
+
+		consider_latest_rating_only:
+			whether or not consider only latest rating we know
+
+		latest_rating_limiter:
+			hyperparameters for whole recommendar
+			number of latest rating to consider for each user
+
+		training_number_params:
+			hyperparameters for each user
+			can be list of number or ratios
+
+			number n, meaning we know user's first n ratings
+			ratio n, meaning we know users first n% ratings
+
+			here small numbers make more sense in reality
+
+		is_params_ratio:
+			whether or not training_number_params is list of ratio
+
+		col_separator:
+			separator for output file	
+	"""
+
 def evaluate_models_on_yelp_open_dataset(
 	output_dir=OUTPUT_DIR,
 	models=["baseline"],
@@ -660,6 +740,9 @@ def evaluate_models_on_yelp_open_dataset(
 
 		col_separator:
 			separator for output file
+
+	output file:
+		report.data
 	"""
 ```
 
@@ -668,14 +751,20 @@ def evaluate_models_on_yelp_open_dataset(
 class Model:
 	"""
 	state:
+		self.user
 		self.name
 		self.data
 		self.<hyperparameter_name> ...
 	"""
 
-	def __init__(self, model_name, data_reviews):
+	def __init__(self, user_id, model_name, data_reviews):
 		"""
-		model_name: give this model a name
+		user_id: 
+			this model is for a specific user
+
+		model_name: 
+			give this model a name
+
 		data_reviews:
 			pandas dataframe where each row is review
 		"""
@@ -690,10 +779,15 @@ class Model:
 		train on hyperparmaters
 		"""
 
-	def predict(self, user_id, k=10, removeSeen=True):
+	def predict(self, k=10, removeSeen=True):
 		"""
 		predict top 10 restaurants on user
 
 		if k <= 0, return all predictions
+		"""
+
+	def save_model(self, output_dir):
+		"""
+		save this model under output_dir with self.<model_name>_<current_time>
 		"""
 ```

@@ -190,15 +190,6 @@ class LocalRecommendar:
 
 		self.user_ratings = map_user_to_ratings(self.reviews)
 
-	def _get_model(self, model, model_name, data_reviews):
-		"""
-		factory method to get model
-		"""
-		return MAPPING_MODEL[self.model](
-			model_name=model_name,
-			data_reviews=data_reviews
-			)
-
 	def train_for_all_user(
 		self,
 		output_dir,
@@ -339,7 +330,7 @@ class LocalRecommendar:
 
 			print("\tLoad model ...")
 			model = self._get_model(
-				model=self.model,
+				user_id=user_id,
 				model_name=model_name,
 				data_reviews=subset_reviews
 				)
@@ -349,7 +340,6 @@ class LocalRecommendar:
 
 			print("\tModel predicted ...")
 			res_dataframe = model.predict(
-				user_id=user_id,
 				k=self.k,
 				removeSeen=self.removeSeen
 				)
@@ -403,14 +393,14 @@ class LocalRecommendar:
 		restaurant_list = list()
 		for (restaurant, city) in self.rest_city.items():
 			if city in city_list:
-				restaurant_list.append(restaurant)	
+				restaurant_list.append(restaurant)
 
 		subset_reviews = self.reviews_dataframe[
 				self.reviews_dataframe[COL_ITEM].isin(restaurant_list)
 				]
 
 		model = self._get_model(
-				model=self.model,
+				user_id=user_id,
 				model_name="{}_{}".format(self.model, user_id),
 				data_reviews=subset_reviews
 				)
@@ -418,7 +408,6 @@ class LocalRecommendar:
 		model.train()
 
 		res_dataframe = model.predict(
-				user_id=user_id,
 				k=self.k,
 				removeSeen=self.removeSeen
 				)
@@ -426,3 +415,13 @@ class LocalRecommendar:
 		model.close()
 
 		return res_dataframe[COL_ITEM].tolist()
+
+	def _get_model(self, user_id, model_name, data_reviews):
+		"""
+		factory method to get user personalized model
+		"""
+		return MAPPING_MODEL[self.model](
+			user_id=user_id,
+			model_name=model_name,
+			data_reviews=data_reviews
+			)

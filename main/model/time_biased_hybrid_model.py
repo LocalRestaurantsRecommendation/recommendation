@@ -1,50 +1,45 @@
 import pandas as pd
-from datetime import datetime
+from datetime import datetime, timedelta
 from main.constants import *
 from main.model.naive_hybrid_baseline_als_model import Model as NHBAModel
 
-RATING_TIME_RANGE = {
-	"1 month": 31, 
-	"1 week": 7,
-	"3 days": 3,
-	"1 day": 1
-}
+DEFAULT_TIME_RANGE = 7
+# tuned from [1,3,7,30] on 11 users (min_rating >= 500)
 
 class Model:
 	"""
 	state:
+		self.user
 		self.name
 		self.data
 		self.<hyperparameter_name> ...
 	"""
 
-	def __init__(self, model_name, data_reviews):
+	def __init__(self, user_id, model_name, data_reviews):
 		"""
-		model_name: give this model a name
+		user_id: 
+			this model is for a specific user
+
+		model_name: 
+			give this model a name
+
 		data_reviews:
 			pandas dataframe where each row is review
 		"""
+		self.user = user_id
 		self.name = model_name
 		self.data = data_reviews
 
-		self.latest_rating_range = RATING_TIME_RANGE["1 week"]
+		self.latest_rating_range = timedelta(days = DEFAULT_TIME_RANGE)
 
-		df = data_reviews.sort_values(COL_TIMESTAMP, ascending=False).reset_index()
-		latest_timestamp = int(df.iloc[0][COL_TIMESTAMP])
-		latest_datetime = datetime.fromtimestamp(latest_timestamp)
+		last_valid_time = data_reviews[data_reviews[COL_USER] == user_id] \
+					.sort_values(COL_TIMESTAMP, ascending=False) \
+					.iloc[0][COL_TIMESTAMP] - self.latest_rating_range.total_seconds()
 
-		first_invalid = 0
-		for index, row in df.iterrows():
-			cur_timestamp = int(row[COL_TIMESTAMP])
-			cur_datetime = datetime.fromtimestamp(cur_timestamp)
-			timediff = (latest_datetime - cur_datetime).days
-			if timediff > self.latest_rating_range:
-				first_invalid = index
-				break
-
-		df = df.head(first_invalid).reset_index()
+		df = data_reviews[data_reviews[COL_TIMESTAMP] >= last_valid_time]
 
 		self.model = NHBAModel(
+			user_id=self.user,
 			model_name=f"{self.name}_nhba",
 			data_reviews=df
 			)
@@ -61,16 +56,16 @@ class Model:
 		"""
 		self.model.train()
 
-	def predict(self, user_id, k=10, removeSeen=True):
+	def predict(self, k=10, removeSeen=True):
 		"""
 		predict top 10 restaurants on user
 
 		if k <= 0, return all predictions
 		"""
 		if not removeSeen:
-			return self.model.predict(user_id=user_id, k=k, removeSeen=removeSeen)
+			return self.model.predict(k=k, removeSeen=removeSeen)
 
-		naive_pred = self.model.predict(user_id=user_id, k=0, removeSeen=removeSeen)
+		naive_pred = self.model.predict(k=0, removeSeen=removeSeen)
 
 		user_item_columns = [COL_USER, COL_ITEM]
 		pred = naive_pred.loc[
@@ -82,8 +77,10 @@ class Model:
 		if k <= 0:
 			return pred
 		else:
-			return pred.head(k) 
+			return pred.head(k)
 
-
-
-
+	def save_model(self, output_dir):
+		"""
+		save this model under output_dir with self.<model_name>_<current_time>
+		"""
+		pass

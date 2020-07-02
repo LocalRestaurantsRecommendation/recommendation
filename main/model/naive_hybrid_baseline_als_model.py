@@ -6,17 +6,24 @@ from main.model.baseline_model import rank_restaurants_by_rates
 class Model:
 	"""
 	state:
+		self.user
 		self.name
 		self.data
 		self.<hyperparameter_name> ...
 	"""
 
-	def __init__(self, model_name, data_reviews):
+	def __init__(self, user_id, model_name, data_reviews):
 		"""
-		model_name: give this model a name
+		user_id: 
+			this model is for a specific user
+
+		model_name: 
+			give this model a name
+
 		data_reviews:
 			pandas dataframe where each row is review
 		"""
+		self.user = user_id
 		self.name = model_name
 		self.data = data_reviews
 
@@ -26,6 +33,7 @@ class Model:
 		df = df[[COL_USER, COL_ITEM, "result", COL_TIMESTAMP]].rename(columns={"result" : COL_RATING})
 
 		self.model = AlsModel(
+			user_id=self.user,
 			model_name=f"{self.name}_als",
 			data_reviews=df
 			)
@@ -42,11 +50,16 @@ class Model:
 		"""
 		self.model.train()
 
-
-	def predict(self, user_id, k=10, removeSeen=True):
+	def predict(self, k=10, removeSeen=True):
 		"""
 		predict top 10 restaurants on user
 
 		if k <= 0, return all predictions
 		"""
-		return self.model.predict(user_id=user_id, k=k, removeSeen=removeSeen)
+		return self.model.predict(k=k, removeSeen=removeSeen)
+
+	def save_model(self, output_dir):
+		"""
+		save this model under output_dir with self.<model_name>_<current_time>
+		"""
+		pass
