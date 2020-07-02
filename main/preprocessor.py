@@ -12,6 +12,7 @@ HOURS = "hours"
 CATEGORIES = "categories"
 ATTRIBUTES = "attributes"
 CITY = "city"
+STATE = "state"
 
 WORKDAYS = "workdays"
 WORKDAYS_VALUE = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
@@ -111,11 +112,12 @@ def preprocess_attributes(business):
 			attrs_dict[key] = val
 	business[ATTRIBUTES] = attrs_dict
 
-def add_cities(cities, business):
+def add_location(cities, states, business):
 	"""
 	add business's city to cities set
 	"""
 	cities.add(business[CITY])
+	states.add(business[STATE])
 
 def add_categories(categories, business):
 	"""
@@ -210,6 +212,7 @@ def init_features(
 	attributes,
 	categories,
 	cities,
+	states,
 	workdays,
 	start_time,
 	end_time,
@@ -217,7 +220,7 @@ def init_features(
 	feature_separator=FEATURE_SEPARATOR
 	):
 	"""
-	initialize feature from attributes, categories, cities, 
+	initialize feature from attributes, categories, cities, states, 
 	workdays, start_time & end_time
 
 	output:
@@ -234,9 +237,12 @@ def init_features(
 		feature_name = CATEGORIES + feature_separator + category
 		existfeatures.append(feature_name)
 
-	# cities are val feature
+	# cities & states are val feature
 	cities.add(DEFAULT_VAL_IF_NOT_EXIST)
 	valfeatures[CITY] = cities
+
+	states.add(DEFAULT_VAL_IF_NOT_EXIST)
+	valfeatures[STATE] = states
 
 	# workdays are exist feature
 	for day in workdays:
@@ -351,6 +357,7 @@ def load_restaurants_and_features(
 	attributes = dict()
 	categories = set()
 	cities = set()
+	states = set()
 
 	workdays = WORKDAYS_VALUE
 	start_time = [WORKDAYS_START(day) for day in workdays]
@@ -373,19 +380,20 @@ def load_restaurants_and_features(
 
 					add_attributes(attributes, business)
 					add_categories(categories, business)
-					add_cities(cities, business)
+					add_location(cities, states, business)
 	except IOError:
 		print("{} doesn't exists".format(business_file))
 
 	print("distinct restaurants {}".format(len(restaurants)))
 
 	tffeature, valfeature, existfeature = init_features(
-		attributes, 
-		categories, 
-		cities, 
-		workdays,
-		start_time,
-		end_time)
+		attributes=attributes, 
+		categories=categories, 
+		cities=cities,
+		states=states,
+		workdays=workdays,
+		start_time=start_time,
+		end_time=end_time)
 	print("distinct true/false features {}".format(len(tffeature)))
 	print("distinct value features {}".format(len(valfeature)))
 	print("distinct exist features {}".format(len(existfeature)))
